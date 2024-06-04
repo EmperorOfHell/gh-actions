@@ -16,5 +16,4 @@ function run(){
 
     core.notice('Hit the end of action!')
 }
-
 run();
