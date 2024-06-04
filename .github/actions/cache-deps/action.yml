@@ -7,7 +7,7 @@ inputs:
    default: 'true'  
 outputs:
   used-cache:
-    desctiption: 'Whether the cache was used.'
+    description: 'Whether the cache was used.'
     value: ${{ steps.install.outputs.cache }}
 runs:
   using: 'composite'
