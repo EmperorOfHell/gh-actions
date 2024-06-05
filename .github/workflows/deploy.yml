@@ -51,8 +51,12 @@ jobs:
           name: dist-files
           path: dist
   deploy:
-    environment: deploy
+    permissions:
+      id-token: write
+      contents: read
     needs: build
+    env:
+      BUCKET_REGION: eu-north-1
     runs-on: ubuntu-latest
     steps:
       - name: Get code
@@ -64,16 +68,18 @@ jobs:
           path: ./dist
       - name: Output contents
         run: ls
+      - name: Get access to S3
+        uses: aws-actions/configure-aws-credentials@v4
+        with: 
+          role-to-assume: arn:aws:iam::058264422341:role/GitHubAccessS3
+          aws-region: ${{ env.BUCKET_REGION }}
       - name: Deploy site
         uses: ./.github/actions/deploy-s3-docker
         id: deploy
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
         with:
           bucket: kosty-gha
           dist-folder: ./dist
-          bucket-region: eu-north-1
+          bucket-region: ${{ env.BUCKET_REGION }}
       - name: Output inforamtion
         run: |
           echo "Liver URL: ${{ steps.deploy.outputs.website-url }}"
